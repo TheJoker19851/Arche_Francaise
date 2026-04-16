@@ -15,6 +15,10 @@ export function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).substring(2, 8);
 }
 
+export function normalizeName(name: string): string {
+  return name.trim();
+}
+
 export async function getActiveSeason(): Promise<Season | undefined> {
   await init();
   const db = getDb();
@@ -228,25 +232,40 @@ export async function addSeason(season: Season, seasonPlayers: SeasonPlayer[]): 
 export async function addPlayer(player: Player): Promise<void> {
   await init();
   const db = getDb();
+  const existing = await findPlayerByName(player.name);
+  if (existing) throw new Error(`Player "${player.name}" already exists`);
   await db.execute({
     sql: "INSERT INTO players (id, name, is_active) VALUES (?, ?, ?)",
-    args: [player.id, player.name, player.isActive ? 1 : 0],
+    args: [player.id, normalizeName(player.name), player.isActive ? 1 : 0],
   });
 }
 
-export async function addPlayerToSeason(playerId: string, name: string, seasonId: string, startLevel: number): Promise<void> {
+export async function addPlayerToSeason(playerId: string, name: string, seasonId: string, startLevel: number): Promise<string> {
   await init();
   const db = getDb();
-  await db.batch([
-    {
-      sql: "INSERT OR IGNORE INTO players (id, name, is_active) VALUES (?, ?, 1)",
-      args: [playerId, name],
-    },
-    {
+  const cleaned = normalizeName(name);
+  const existing = await findPlayerByName(cleaned);
+  const resolvedId = existing ? existing.id : playerId;
+
+  if (!existing) {
+    await db.execute({
+      sql: "INSERT INTO players (id, name, is_active) VALUES (?, ?, 1)",
+      args: [resolvedId, cleaned],
+    });
+  }
+
+  const spCheck = await db.execute({
+    sql: "SELECT id FROM season_players WHERE season_id = ? AND player_id = ?",
+    args: [seasonId, resolvedId],
+  });
+  if (spCheck.rows.length === 0) {
+    await db.execute({
       sql: "INSERT INTO season_players (id, season_id, player_id, start_level) VALUES (?, ?, ?, ?)",
-      args: [generateId(), seasonId, playerId, startLevel],
-    },
-  ], "write");
+      args: [generateId(), seasonId, resolvedId, startLevel],
+    });
+  }
+
+  return resolvedId;
 }
 
 export async function findPlayerByName(name: string): Promise<Player | undefined> {
@@ -254,7 +273,7 @@ export async function findPlayerByName(name: string): Promise<Player | undefined
   const db = getDb();
   const rs = await db.execute({
     sql: "SELECT * FROM players WHERE LOWER(name) = LOWER(?) LIMIT 1",
-    args: [name.trim()],
+    args: [normalizeName(name)],
   });
   if (rs.rows.length === 0) return undefined;
   return rowToPlayer(rs.rows[0]);
@@ -265,107 +284,8 @@ export async function updatePlayer(player: Player): Promise<void> {
   const db = getDb();
   await db.execute({
     sql: "UPDATE players SET name = ?, is_active = ? WHERE id = ?",
-    args: [player.name, player.isActive ? 1 : 0, player.id],
+    args: [normalizeName(player.name), player.isActive ? 1 : 0, player.id],
   });
-}
-
-export async function seedData(): Promise<void> {
-  await init();
-  const db = getDb();
-  const existing = await db.execute("SELECT COUNT(*) as cnt FROM seasons");
-  if ((existing.rows[0].cnt as number) > 0) return;
-
-  const stmts: Array<string | { sql: string; args: (string | number)[] }> = [];
-
-  const players = [
-    { id: "p1", name: "Israr", isActive: true },
-    { id: "p2", name: "Kaizer", isActive: true },
-    { id: "p3", name: "Luna", isActive: true },
-    { id: "p4", name: "Shadow", isActive: true },
-    { id: "p5", name: "Viper", isActive: true },
-    { id: "p6", name: "Storm", isActive: true },
-    { id: "p7", name: "Blaze", isActive: true },
-    { id: "p8", name: "Frost", isActive: true },
-  ];
-
-  for (const p of players) {
-    stmts.push({
-      sql: "INSERT INTO players (id, name, is_active) VALUES (?, ?, ?)",
-      args: [p.id, p.name, 1],
-    });
-  }
-
-  stmts.push({
-    sql: "INSERT INTO seasons (id, name, start_date, end_date, is_active) VALUES (?, ?, ?, ?, ?)",
-    args: ["s1", "Saison 1 — Avril 2026", "2026-04-01", "2026-04-30", 1],
-  });
-
-  const seasonPlayers = [
-    { id: "sp1", seasonId: "s1", playerId: "p1", startLevel: 480 },
-    { id: "sp2", seasonId: "s1", playerId: "p2", startLevel: 475 },
-    { id: "sp3", seasonId: "s1", playerId: "p3", startLevel: 490 },
-    { id: "sp4", seasonId: "s1", playerId: "p4", startLevel: 465 },
-    { id: "sp5", seasonId: "s1", playerId: "p5", startLevel: 500 },
-    { id: "sp6", seasonId: "s1", playerId: "p6", startLevel: 470 },
-    { id: "sp7", seasonId: "s1", playerId: "p7", startLevel: 485 },
-    { id: "sp8", seasonId: "s1", playerId: "p8", startLevel: 492 },
-  ];
-
-  for (const sp of seasonPlayers) {
-    stmts.push({
-      sql: "INSERT INTO season_players (id, season_id, player_id, start_level) VALUES (?, ?, ?, ?)",
-      args: [sp.id, sp.seasonId, sp.playerId, sp.startLevel],
-    });
-  }
-
-  const fights = [
-    { id: "f1", seasonId: "s1", against: "iGerX 2", fightDate: "2026-04-05", notes: "Victoire écrasante" },
-    { id: "f2", seasonId: "s1", against: "Legion FR", fightDate: "2026-04-08", notes: "" },
-    { id: "f3", seasonId: "s1", against: "Shadow Guild", fightDate: "2026-04-11", notes: "" },
-  ];
-
-  for (const f of fights) {
-    stmts.push({
-      sql: "INSERT INTO fights (id, season_id, against, fight_date, notes) VALUES (?, ?, ?, ?, ?)",
-      args: [f.id, f.seasonId, f.against, f.fightDate, f.notes],
-    });
-  }
-
-  const fightEntries = [
-    { id: "e1_1", fightId: "f1", playerId: "p1", levelAtFight: 483, damage: 465060, shieldsBroken: 12 },
-    { id: "e1_2", fightId: "f1", playerId: "p2", levelAtFight: 478, damage: 398200, shieldsBroken: 8 },
-    { id: "e1_3", fightId: "f1", playerId: "p3", levelAtFight: 493, damage: 520100, shieldsBroken: 15 },
-    { id: "e1_4", fightId: "f1", playerId: "p4", levelAtFight: 468, damage: 310500, shieldsBroken: 5 },
-    { id: "e1_5", fightId: "f1", playerId: "p5", levelAtFight: 503, damage: 580000, shieldsBroken: 18 },
-    { id: "e1_6", fightId: "f1", playerId: "p6", levelAtFight: 472, damage: 290000, shieldsBroken: 3 },
-    { id: "e1_7", fightId: "f1", playerId: "p7", levelAtFight: 487, damage: 410000, shieldsBroken: 10 },
-    { id: "e1_8", fightId: "f1", playerId: "p8", levelAtFight: 494, damage: 475000, shieldsBroken: 14 },
-
-    { id: "e2_1", fightId: "f2", playerId: "p1", levelAtFight: 485, damage: 510000, shieldsBroken: 14 },
-    { id: "e2_2", fightId: "f2", playerId: "p2", levelAtFight: 480, damage: 420000, shieldsBroken: 9 },
-    { id: "e2_3", fightId: "f2", playerId: "p3", levelAtFight: 495, damage: 535000, shieldsBroken: 16 },
-    { id: "e2_4", fightId: "f2", playerId: "p4", levelAtFight: 470, damage: 345000, shieldsBroken: 7 },
-    { id: "e2_5", fightId: "f2", playerId: "p5", levelAtFight: 505, damage: 610000, shieldsBroken: 20 },
-    { id: "e2_6", fightId: "f2", playerId: "p7", levelAtFight: 489, damage: 440000, shieldsBroken: 11 },
-    { id: "e2_7", fightId: "f2", playerId: "p8", levelAtFight: 496, damage: 490000, shieldsBroken: 13 },
-
-    { id: "e3_1", fightId: "f3", playerId: "p1", levelAtFight: 487, damage: 465060, shieldsBroken: 0 },
-    { id: "e3_2", fightId: "f3", playerId: "p3", levelAtFight: 497, damage: 570000, shieldsBroken: 17 },
-    { id: "e3_3", fightId: "f3", playerId: "p4", levelAtFight: 472, damage: 380000, shieldsBroken: 8 },
-    { id: "e3_4", fightId: "f3", playerId: "p5", levelAtFight: 507, damage: 625000, shieldsBroken: 22 },
-    { id: "e3_5", fightId: "f3", playerId: "p6", levelAtFight: 474, damage: 305000, shieldsBroken: 4 },
-    { id: "e3_6", fightId: "f3", playerId: "p7", levelAtFight: 491, damage: 455000, shieldsBroken: 12 },
-    { id: "e3_7", fightId: "f3", playerId: "p8", levelAtFight: 498, damage: 500000, shieldsBroken: 15 },
-  ];
-
-  for (const e of fightEntries) {
-    stmts.push({
-      sql: "INSERT INTO fight_entries (id, fight_id, player_id, level_at_fight, damage, shields_broken) VALUES (?, ?, ?, ?, ?, ?)",
-      args: [e.id, e.fightId, e.playerId, e.levelAtFight, e.damage, e.shieldsBroken],
-    });
-  }
-
-  await db.batch(stmts, "write");
 }
 
 function rowToSeason(row: Record<string, unknown>): Season {

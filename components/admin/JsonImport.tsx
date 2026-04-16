@@ -238,17 +238,26 @@ function validateAndParse(raw: unknown, knownPlayers: SeasonPlayer[]): ParsedFig
   }
 
   const playerMap = new Map(knownPlayers.map((p) => [p.playerName.toLowerCase().trim(), p.playerId]));
+  const seenNames = new Map<string, { index: number; normalized: string }>();
 
   const entries: ParsedEntry[] = (obj.entries as unknown[]).map((entry, i) => {
     const e = entry as Record<string, unknown>;
     const entryErrors: string[] = [];
 
     const playerName = String(e.playerName ?? "").trim();
+    const normalized = playerName.toLowerCase();
     const levelAtFight = e.levelAtFight;
     const damage = e.damage;
     const shieldsBroken = e.shieldsBroken;
 
     if (!playerName) entryErrors.push(`Entry ${i + 1}: playerName requis`);
+
+    const prev = seenNames.get(normalized);
+    if (prev && playerName) {
+      entryErrors.push(`Entry ${i + 1}: "${playerName}" apparaît aussi en entry ${prev.index + 1}`);
+    } else if (playerName) {
+      seenNames.set(normalized, { index: i, normalized });
+    }
 
     if (typeof levelAtFight !== "number" || !Number.isInteger(levelAtFight) || levelAtFight < 0) {
       entryErrors.push(`Entry ${i + 1}: levelAtFight doit être un entier positif`);

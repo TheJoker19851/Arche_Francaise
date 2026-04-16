@@ -13,6 +13,8 @@ export const SCHEMA_SQL = [
     is_active INTEGER NOT NULL DEFAULT 1
   )`,
 
+  `CREATE UNIQUE INDEX IF NOT EXISTS idx_players_name_lower ON players (LOWER(name))`,
+
   `CREATE TABLE IF NOT EXISTS season_players (
     id TEXT PRIMARY KEY,
     season_id TEXT NOT NULL REFERENCES seasons(id),

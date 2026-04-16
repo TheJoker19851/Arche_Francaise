@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getActiveSeason, getPlayers, getSeasonPlayers, addFight, addPlayerToSeason, findPlayerByName, generateId } from "@/lib/data/store";
+import { getActiveSeason, getPlayers, getSeasonPlayers, addFight, addPlayerToSeason, generateId } from "@/lib/data/store";
 
 export async function GET() {
   const season = await getActiveSeason();
@@ -42,12 +42,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
-  const [allPlayers, seasonPlayers] = await Promise.all([
-    getPlayers(),
-    getSeasonPlayers(season.id),
-  ]);
+  const seasonPlayers = await getSeasonPlayers(season.id);
   const seasonPlayerIds = new Set(seasonPlayers.map((sp) => sp.playerId));
-  const playerNameMap = new Map(allPlayers.map((p) => [p.name.toLowerCase().trim(), p]));
 
   const resolvedEntries: { playerId: string; levelAtFight: number; damage: number; shieldsBroken: number }[] = [];
 
@@ -65,27 +61,21 @@ export async function POST(request: NextRequest) {
     let playerId = entry.playerId;
 
     if (!playerId && entry.playerName) {
-      const name = entry.playerName.trim();
-      const existing = playerNameMap.get(name.toLowerCase());
-      if (existing) {
-        playerId = existing.id;
-      } else {
-        playerId = generateId();
-        await addPlayerToSeason(playerId, name, season.id, entry.levelAtFight);
-        playerNameMap.set(name.toLowerCase(), { id: playerId, name, isActive: true });
-      }
+      playerId = await addPlayerToSeason(
+        generateId(),
+        entry.playerName,
+        season.id,
+        entry.levelAtFight
+      );
     }
 
     if (!playerId) {
       return NextResponse.json({ error: "Entry missing playerId or playerName" }, { status: 400 });
     }
 
-    if (!seasonPlayerIds.has(playerId) && !playerNameMap.has((entry.playerName ?? "").toLowerCase())) {
-      const found = await findPlayerByName(entry.playerName ?? "");
-      if (found) {
-        playerId = found.id;
-        await addPlayerToSeason(playerId, found.name, season.id, entry.levelAtFight);
-      }
+    if (!seasonPlayerIds.has(playerId)) {
+      await addPlayerToSeason(playerId, playerId, season.id, entry.levelAtFight);
+      seasonPlayerIds.add(playerId);
     }
 
     resolvedEntries.push({
