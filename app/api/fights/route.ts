@@ -1,0 +1,120 @@
+import { NextRequest, NextResponse } from "next/server";
+import { getActiveSeason, getPlayers, getSeasonPlayers, addFight, addPlayerToSeason, findPlayerByName, generateId } from "@/lib/data/store";
+
+export async function GET() {
+  const season = await getActiveSeason();
+  if (!season) {
+    return NextResponse.json({ season: null, players: [] });
+  }
+
+  const [players, seasonPlayers] = await Promise.all([
+    getPlayers(),
+    getSeasonPlayers(season.id),
+  ]);
+
+  const result = seasonPlayers.map((sp) => {
+    const player = players.find((p) => p.id === sp.playerId);
+    return {
+      playerId: sp.playerId,
+      playerName: player?.name ?? "Inconnu",
+      startLevel: sp.startLevel,
+    };
+  });
+
+  return NextResponse.json({ season, players: result });
+}
+
+export async function POST(request: NextRequest) {
+  const season = await getActiveSeason();
+  if (!season) {
+    return NextResponse.json({ error: "No active season" }, { status: 400 });
+  }
+
+  const body = await request.json();
+  const { against, fightDate, notes, entries } = body as {
+    against: string;
+    fightDate: string;
+    notes?: string;
+    entries: { playerId?: string; playerName?: string; levelAtFight: number; damage: number; shieldsBroken: number }[];
+  };
+
+  if (!against || !fightDate || !entries?.length) {
+    return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+  }
+
+  const [allPlayers, seasonPlayers] = await Promise.all([
+    getPlayers(),
+    getSeasonPlayers(season.id),
+  ]);
+  const seasonPlayerIds = new Set(seasonPlayers.map((sp) => sp.playerId));
+  const playerNameMap = new Map(allPlayers.map((p) => [p.name.toLowerCase().trim(), p]));
+
+  const resolvedEntries: { playerId: string; levelAtFight: number; damage: number; shieldsBroken: number }[] = [];
+
+  for (const entry of entries) {
+    if (!Number.isInteger(entry.damage) || entry.damage < 0) {
+      return NextResponse.json({ error: "Damage must be a non-negative integer" }, { status: 400 });
+    }
+    if (!Number.isInteger(entry.shieldsBroken) || entry.shieldsBroken < 0) {
+      return NextResponse.json({ error: "Shields must be a non-negative integer" }, { status: 400 });
+    }
+    if (!Number.isInteger(entry.levelAtFight) || entry.levelAtFight < 0) {
+      return NextResponse.json({ error: "Level must be a non-negative integer" }, { status: 400 });
+    }
+
+    let playerId = entry.playerId;
+
+    if (!playerId && entry.playerName) {
+      const name = entry.playerName.trim();
+      const existing = playerNameMap.get(name.toLowerCase());
+      if (existing) {
+        playerId = existing.id;
+      } else {
+        playerId = generateId();
+        await addPlayerToSeason(playerId, name, season.id, entry.levelAtFight);
+        playerNameMap.set(name.toLowerCase(), { id: playerId, name, isActive: true });
+      }
+    }
+
+    if (!playerId) {
+      return NextResponse.json({ error: "Entry missing playerId or playerName" }, { status: 400 });
+    }
+
+    if (!seasonPlayerIds.has(playerId) && !playerNameMap.has((entry.playerName ?? "").toLowerCase())) {
+      const found = await findPlayerByName(entry.playerName ?? "");
+      if (found) {
+        playerId = found.id;
+        await addPlayerToSeason(playerId, found.name, season.id, entry.levelAtFight);
+      }
+    }
+
+    resolvedEntries.push({
+      playerId,
+      levelAtFight: entry.levelAtFight,
+      damage: entry.damage,
+      shieldsBroken: entry.shieldsBroken,
+    });
+  }
+
+  const fightId = generateId();
+  const fight = {
+    id: fightId,
+    seasonId: season.id,
+    against,
+    fightDate,
+    notes: notes || "",
+  };
+
+  const fightEntries = resolvedEntries.map((e) => ({
+    id: generateId(),
+    fightId,
+    playerId: e.playerId,
+    levelAtFight: e.levelAtFight,
+    damage: e.damage,
+    shieldsBroken: e.shieldsBroken,
+  }));
+
+  await addFight(fight, fightEntries);
+
+  return NextResponse.json({ success: true, fightId });
+}

@@ -1,0 +1,304 @@
+{
+  "seasons": [
+    {
+      "id": "s1",
+      "name": "Saison 1 — Avril 2026",
+      "startDate": "2026-04-01",
+      "endDate": "2026-04-30",
+      "isActive": true
+    }
+  ],
+  "players": [
+    {
+      "id": "p1",
+      "name": "Israr",
+      "isActive": true
+    },
+    {
+      "id": "p2",
+      "name": "Kaizer",
+      "isActive": true
+    },
+    {
+      "id": "p3",
+      "name": "Luna",
+      "isActive": true
+    },
+    {
+      "id": "p4",
+      "name": "Shadow",
+      "isActive": true
+    },
+    {
+      "id": "p5",
+      "name": "Viper",
+      "isActive": true
+    },
+    {
+      "id": "p6",
+      "name": "Storm",
+      "isActive": true
+    },
+    {
+      "id": "p7",
+      "name": "Blaze",
+      "isActive": true
+    },
+    {
+      "id": "p8",
+      "name": "Frost",
+      "isActive": true
+    }
+  ],
+  "seasonPlayers": [
+    {
+      "id": "sp1",
+      "seasonId": "s1",
+      "playerId": "p1",
+      "startLevel": 480
+    },
+    {
+      "id": "sp2",
+      "seasonId": "s1",
+      "playerId": "p2",
+      "startLevel": 475
+    },
+    {
+      "id": "sp3",
+      "seasonId": "s1",
+      "playerId": "p3",
+      "startLevel": 490
+    },
+    {
+      "id": "sp4",
+      "seasonId": "s1",
+      "playerId": "p4",
+      "startLevel": 465
+    },
+    {
+      "id": "sp5",
+      "seasonId": "s1",
+      "playerId": "p5",
+      "startLevel": 500
+    },
+    {
+      "id": "sp6",
+      "seasonId": "s1",
+      "playerId": "p6",
+      "startLevel": 470
+    },
+    {
+      "id": "sp7",
+      "seasonId": "s1",
+      "playerId": "p7",
+      "startLevel": 485
+    },
+    {
+      "id": "sp8",
+      "seasonId": "s1",
+      "playerId": "p8",
+      "startLevel": 492
+    }
+  ],
+  "fights": [
+    {
+      "id": "f1",
+      "seasonId": "s1",
+      "against": "iGerX 2",
+      "fightDate": "2026-04-05",
+      "notes": "Victoire écrasante"
+    },
+    {
+      "id": "f2",
+      "seasonId": "s1",
+      "against": "Legion FR",
+      "fightDate": "2026-04-08",
+      "notes": ""
+    },
+    {
+      "id": "f3",
+      "seasonId": "s1",
+      "against": "Shadow Guild",
+      "fightDate": "2026-04-11",
+      "notes": ""
+    }
+  ],
+  "fightEntries": [
+    {
+      "id": "e1_1",
+      "fightId": "f1",
+      "playerId": "p1",
+      "levelAtFight": 483,
+      "damage": 465060,
+      "shieldsBroken": 12
+    },
+    {
+      "id": "e1_2",
+      "fightId": "f1",
+      "playerId": "p2",
+      "levelAtFight": 478,
+      "damage": 398200,
+      "shieldsBroken": 8
+    },
+    {
+      "id": "e1_3",
+      "fightId": "f1",
+      "playerId": "p3",
+      "levelAtFight": 493,
+      "damage": 520100,
+      "shieldsBroken": 15
+    },
+    {
+      "id": "e1_4",
+      "fightId": "f1",
+      "playerId": "p4",
+      "levelAtFight": 468,
+      "damage": 310500,
+      "shieldsBroken": 5
+    },
+    {
+      "id": "e1_5",
+      "fightId": "f1",
+      "playerId": "p5",
+      "levelAtFight": 503,
+      "damage": 580000,
+      "shieldsBroken": 18
+    },
+    {
+      "id": "e1_6",
+      "fightId": "f1",
+      "playerId": "p6",
+      "levelAtFight": 472,
+      "damage": 290000,
+      "shieldsBroken": 3
+    },
+    {
+      "id": "e1_7",
+      "fightId": "f1",
+      "playerId": "p7",
+      "levelAtFight": 487,
+      "damage": 410000,
+      "shieldsBroken": 10
+    },
+    {
+      "id": "e1_8",
+      "fightId": "f1",
+      "playerId": "p8",
+      "levelAtFight": 494,
+      "damage": 475000,
+      "shieldsBroken": 14
+    },
+    {
+      "id": "e2_1",
+      "fightId": "f2",
+      "playerId": "p1",
+      "levelAtFight": 485,
+      "damage": 510000,
+      "shieldsBroken": 14
+    },
+    {
+      "id": "e2_2",
+      "fightId": "f2",
+      "playerId": "p2",
+      "levelAtFight": 480,
+      "damage": 420000,
+      "shieldsBroken": 9
+    },
+    {
+      "id": "e2_3",
+      "fightId": "f2",
+      "playerId": "p3",
+      "levelAtFight": 495,
+      "damage": 535000,
+      "shieldsBroken": 16
+    },
+    {
+      "id": "e2_4",
+      "fightId": "f2",
+      "playerId": "p4",
+      "levelAtFight": 470,
+      "damage": 345000,
+      "shieldsBroken": 7
+    },
+    {
+      "id": "e2_5",
+      "fightId": "f2",
+      "playerId": "p5",
+      "levelAtFight": 505,
+      "damage": 610000,
+      "shieldsBroken": 20
+    },
+    {
+      "id": "e2_6",
+      "fightId": "f2",
+      "playerId": "p7",
+      "levelAtFight": 489,
+      "damage": 440000,
+      "shieldsBroken": 11
+    },
+    {
+      "id": "e2_7",
+      "fightId": "f2",
+      "playerId": "p8",
+      "levelAtFight": 496,
+      "damage": 490000,
+      "shieldsBroken": 13
+    },
+    {
+      "id": "e3_1",
+      "fightId": "f3",
+      "playerId": "p1",
+      "levelAtFight": 487,
+      "damage": 465060,
+      "shieldsBroken": 0
+    },
+    {
+      "id": "e3_2",
+      "fightId": "f3",
+      "playerId": "p3",
+      "levelAtFight": 497,
+      "damage": 570000,
+      "shieldsBroken": 17
+    },
+    {
+      "id": "e3_3",
+      "fightId": "f3",
+      "playerId": "p4",
+      "levelAtFight": 472,
+      "damage": 380000,
+      "shieldsBroken": 8
+    },
+    {
+      "id": "e3_4",
+      "fightId": "f3",
+      "playerId": "p5",
+      "levelAtFight": 507,
+      "damage": 625000,
+      "shieldsBroken": 22
+    },
+    {
+      "id": "e3_5",
+      "fightId": "f3",
+      "playerId": "p6",
+      "levelAtFight": 474,
+      "damage": 305000,
+      "shieldsBroken": 4
+    },
+    {
+      "id": "e3_6",
+      "fightId": "f3",
+      "playerId": "p7",
+      "levelAtFight": 491,
+      "damage": 455000,
+      "shieldsBroken": 12
+    },
+    {
+      "id": "e3_7",
+      "fightId": "f3",
+      "playerId": "p8",
+      "levelAtFight": 498,
+      "damage": 500000,
+      "shieldsBroken": 15
+    }
+  ]
+}
