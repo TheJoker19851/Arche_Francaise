@@ -22,21 +22,21 @@ export default function CombatsClient({
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-white">Combats — {seasonName}</h2>
+      <div className="mb-4">
+        <h2 className="text-lg sm:text-xl font-semibold text-white">Combats — {seasonName}</h2>
       </div>
       {fights.length === 0 ? (
         <div className="bg-gray-900 border border-gray-800 rounded-xl px-4 py-8 text-center text-gray-500">
           Aucun combat enregistré cette saison.
         </div>
       ) : (
-        <CombatsTable fights={fights} />
+        <CombatsList fights={fights} />
       )}
     </div>
   );
 }
 
-function CombatsTable({ fights }: { fights: FightSummary[] }) {
+function CombatsList({ fights }: { fights: FightSummary[] }) {
   const [expandedFightId, setExpandedFightId] = useState<string | null>(null);
 
   function toggleExpand(fightId: string) {
@@ -44,64 +44,85 @@ function CombatsTable({ fights }: { fights: FightSummary[] }) {
   }
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-      <div className="hidden sm:block overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-gray-800/60 text-gray-400 text-xs uppercase tracking-wider">
-              <th className="text-left py-3 px-4 font-medium">Adversaire</th>
-              <th className="text-left py-3 px-4 font-medium">Date</th>
-              <th className="text-right py-3 px-4 font-medium">Total Damage</th>
-              <th className="text-right py-3 px-4 font-medium">Total Bouclier</th>
-              <th className="text-right py-3 px-4 font-medium">Participants</th>
-              <th className="text-left py-3 px-4 font-medium">MVP</th>
-            </tr>
-          </thead>
-          <tbody>
-            {fights.map((fight) => {
-              const isExpanded = expandedFightId === fight.fightId;
-              return (
-                <FightRow
-                  key={fight.fightId}
-                  fight={fight}
-                  isExpanded={isExpanded}
-                  onToggle={() => toggleExpand(fight.fightId)}
-                />
-              );
-            })}
-          </tbody>
-        </table>
+    <>
+      <div className="hidden sm:block bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-gray-800/60 text-gray-400 text-xs uppercase tracking-wider">
+                <th className="text-left py-3 px-4 font-medium">Adversaire</th>
+                <th className="text-left py-3 px-4 font-medium">Date</th>
+                <th className="text-right py-3 px-4 font-medium">Total Damage</th>
+                <th className="text-right py-3 px-4 font-medium">Total Bouclier</th>
+                <th className="text-right py-3 px-4 font-medium">Participants</th>
+                <th className="text-left py-3 px-4 font-medium">MVP</th>
+              </tr>
+            </thead>
+            <tbody>
+              {fights.map((fight) => {
+                const isExpanded = expandedFightId === fight.fightId;
+                return (
+                  <FightRow
+                    key={fight.fightId}
+                    fight={fight}
+                    isExpanded={isExpanded}
+                    onToggle={() => toggleExpand(fight.fightId)}
+                  />
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <div className="sm:hidden divide-y divide-gray-800/60">
+      <div className="sm:hidden space-y-3">
         {fights.map((fight) => {
           const isExpanded = expandedFightId === fight.fightId;
           return (
-            <div key={fight.fightId}>
+            <div
+              key={fight.fightId}
+              className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden"
+            >
               <button
                 onClick={() => toggleExpand(fight.fightId)}
-                className="w-full text-left px-4 py-3 hover:bg-gray-800/40 transition-colors"
+                className="w-full text-left px-4 py-3"
               >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium text-white text-sm">{fight.against}</span>
-                  <span className="text-gray-500 text-xs tabular-nums">{formatDate(fight.fightDate)}</span>
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <div>
+                    <div className="font-semibold text-white text-base">{fight.against}</div>
+                    <div className="text-xs text-gray-500 tabular-nums mt-0.5">{formatDate(fight.fightDate)}</div>
+                  </div>
+                  <span className="text-xs bg-gray-800 text-gray-400 px-2 py-1 rounded flex-shrink-0">
+                    {fight.participants} joueur{fight.participants !== 1 ? "s" : ""}
+                  </span>
                 </div>
-                <div className="flex items-center gap-3 text-xs">
-                  <span className="text-white tabular-nums">{formatCompactNumber(fight.totalDamage)} DMG</span>
-                  <span className="text-gray-400 tabular-nums">{formatCompactNumber(fight.totalShields)} SH</span>
-                  <span className="text-yellow-400">★ {fight.mvpPlayerName}</span>
+
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="bg-gray-800/50 rounded-lg px-2 py-1.5 text-center">
+                    <div className="text-[10px] text-gray-500 uppercase">DMG</div>
+                    <div className="text-sm text-white font-semibold tabular-nums">{formatCompactNumber(fight.totalDamage)}</div>
+                  </div>
+                  <div className="bg-gray-800/50 rounded-lg px-2 py-1.5 text-center">
+                    <div className="text-[10px] text-gray-500 uppercase">Bouclier</div>
+                    <div className="text-sm text-white tabular-nums">{formatCompactNumber(fight.totalShields)}</div>
+                  </div>
+                  <div className="bg-gray-800/50 rounded-lg px-2 py-1.5 text-center">
+                    <div className="text-[10px] text-gray-500 uppercase">MVP</div>
+                    <div className="text-sm text-yellow-400 font-medium truncate">{fight.mvpPlayerName}</div>
+                  </div>
                 </div>
               </button>
+
               {isExpanded && (
-                <div className="px-4 pb-3">
-                  <ExpandedFightDetails fight={fight} />
+                <div className="border-t border-gray-800/60 px-4 py-3">
+                  <MobileFightDetails fight={fight} />
                 </div>
               )}
             </div>
           );
         })}
       </div>
-    </div>
+    </>
   );
 }
 
@@ -134,7 +155,7 @@ function FightRow({
       {isExpanded && (
         <tr className="bg-gray-800/30 border-t border-gray-800/60">
           <td colSpan={6} className="px-4 py-3">
-            <ExpandedFightDetails fight={fight} />
+            <DesktopFightDetails fight={fight} />
           </td>
         </tr>
       )}
@@ -142,45 +163,75 @@ function FightRow({
   );
 }
 
-function ExpandedFightDetails({ fight }: { fight: FightSummary }) {
+function MobileFightDetails({ fight }: { fight: FightSummary }) {
   if (fight.entries.length === 0) {
     return <p className="text-gray-500 text-sm italic">Aucune donnée de joueur</p>;
   }
 
   return (
-    <div className="sm:ml-6">
+    <div>
       <h4 className="text-xs text-gray-400 uppercase tracking-wider mb-2">
         Détail des joueurs
       </h4>
-      <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-        <table className="w-full text-sm min-w-[350px]">
-          <thead>
-            <tr className="text-gray-500 text-xs uppercase tracking-wider">
-              <th className="text-left py-2 px-3 font-medium">Joueur</th>
-              <th className="text-right py-2 px-3 font-medium">Level</th>
-              <th className="text-right py-2 px-3 font-medium">Damage</th>
-              <th className="text-right py-2 px-3 font-medium">Bouclier</th>
-            </tr>
-          </thead>
-          <tbody>
-            {fight.entries.map((entry, idx) => (
-              <tr key={entry.playerId} className="border-t border-gray-800/40 hover:bg-gray-800/20">
-                <td className="py-2 px-3 font-medium">
-                  {idx === 0 && <span className="text-yellow-400 mr-1">★</span>}
-                  {entry.playerName}
-                </td>
-                <td className="py-2 px-3 text-right tabular-nums">{entry.levelAtFight}</td>
-                <td className="py-2 px-3 text-right tabular-nums font-semibold">
-                  {formatCompactNumber(entry.damage)}
-                </td>
-                <td className="py-2 px-3 text-right tabular-nums">
-                  {formatCompactNumber(entry.shieldsBroken)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="space-y-2">
+        {fight.entries.map((entry, idx) => (
+          <div
+            key={entry.playerId}
+            className="bg-gray-800/40 rounded-lg px-3 py-2 flex items-center justify-between"
+          >
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+              {idx === 0 && <span className="text-yellow-400 text-sm">★</span>}
+              <span className="text-sm text-white font-medium truncate">{entry.playerName}</span>
+            </div>
+            <div className="flex items-center gap-3 flex-shrink-0 text-xs">
+              <span className="text-gray-400">Lv{entry.levelAtFight}</span>
+              <span className="text-white tabular-nums font-semibold w-14 text-right">{formatCompactNumber(entry.damage)}</span>
+              <span className="text-gray-400 tabular-nums w-12 text-right">{formatCompactNumber(entry.shieldsBroken)} SH</span>
+            </div>
+          </div>
+        ))}
       </div>
+    </div>
+  );
+}
+
+function DesktopFightDetails({ fight }: { fight: FightSummary }) {
+  if (fight.entries.length === 0) {
+    return <p className="text-gray-500 text-sm italic">Aucune donnée de joueur</p>;
+  }
+
+  return (
+    <div className="ml-6">
+      <h4 className="text-xs text-gray-400 uppercase tracking-wider mb-2">
+        Détail des joueurs
+      </h4>
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="text-gray-500 text-xs uppercase tracking-wider">
+            <th className="text-left py-2 px-3 font-medium">Joueur</th>
+            <th className="text-right py-2 px-3 font-medium">Level</th>
+            <th className="text-right py-2 px-3 font-medium">Damage</th>
+            <th className="text-right py-2 px-3 font-medium">Bouclier</th>
+          </tr>
+        </thead>
+        <tbody>
+          {fight.entries.map((entry, idx) => (
+            <tr key={entry.playerId} className="border-t border-gray-800/40 hover:bg-gray-800/20">
+              <td className="py-2 px-3 font-medium">
+                {idx === 0 && <span className="text-yellow-400 mr-1">★</span>}
+                {entry.playerName}
+              </td>
+              <td className="py-2 px-3 text-right tabular-nums">{entry.levelAtFight}</td>
+              <td className="py-2 px-3 text-right tabular-nums font-semibold">
+                {formatCompactNumber(entry.damage)}
+              </td>
+              <td className="py-2 px-3 text-right tabular-nums">
+                {formatCompactNumber(entry.shieldsBroken)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

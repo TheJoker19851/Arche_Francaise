@@ -4,7 +4,7 @@ export default function Header() {
   return (
     <header className="relative w-full h-32 sm:h-48 md:h-56 lg:h-64 overflow-hidden bg-gray-900">
       <Image
-        src="/Entete l'arche.webp"
+        src="/entete-arche.webp"
         alt="Arche Française"
         fill
         className="object-cover object-center"
