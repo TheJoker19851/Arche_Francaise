@@ -115,7 +115,7 @@ export default function JsonImport() {
       <textarea
         value={jsonText}
         onChange={(e) => setJsonText(e.target.value)}
-        placeholder={'{\n  "against": "iGerX 2",\n  "fightDate": "2026-04-11",\n  "entries": [\n    {\n      "playerName": "Israr",\n      "levelAtFight": 487,\n      "damage": 465060,\n      "shieldsBroken": 0\n    }\n  ]\n}'}
+        placeholder={'{\n  "against": "Adversaire",\n  "fightDate": "2026-01-01",\n  "entries": [\n    {\n      "playerName": "Joueur",\n      "levelAtFight": 400,\n      "damage": 300000,\n      "shieldsBroken": 5\n    }\n  ]\n}'}
         rows={12}
         className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-sm text-white font-mono placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 resize-y mb-3"
       />

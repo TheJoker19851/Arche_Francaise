@@ -1,0 +1,1 @@
+libsql://arche-francaise-thejoker19851.aws-us-east-2.turso.io
