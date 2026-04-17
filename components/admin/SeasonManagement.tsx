@@ -67,55 +67,91 @@ function SeasonsList({
 
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden mb-6">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="bg-gray-800/60 text-gray-400 text-xs uppercase tracking-wider">
-            <th className="text-left py-3 px-4 font-medium">Nom</th>
-            <th className="text-left py-3 px-4 font-medium">Début</th>
-            <th className="text-left py-3 px-4 font-medium">Fin</th>
-            <th className="text-left py-3 px-4 font-medium">Statut</th>
-            <th className="text-right py-3 px-4 font-medium">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {seasons.map((season) => (
-            <tr
-              key={season.id}
-              className="border-t border-gray-800/60 hover:bg-gray-800/40 transition-colors"
-            >
-              <td className="py-3 px-4 font-medium text-white">{season.name}</td>
-              <td className="py-3 px-4 tabular-nums">{season.startDate}</td>
-              <td className="py-3 px-4 tabular-nums">{season.endDate}</td>
-              <td className="py-3 px-4">
-                {season.isActive ? (
-                  <span className="text-green-400 text-xs font-medium bg-green-400/10 px-2 py-0.5 rounded">
-                    Active
-                  </span>
-                ) : (
-                  <span className="text-gray-500 text-xs">Inactive</span>
-                )}
-              </td>
-              <td className="py-3 px-4 text-right">
-                {!season.isActive && (
-                  <button
-                    onClick={async () => {
-                      await fetch("/api/seasons", {
-                        method: "PUT",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ seasonId: season.id }),
-                      });
-                      onSetActive();
-                    }}
-                    className="text-blue-400 hover:text-blue-300 text-xs font-medium transition-colors"
-                  >
-                    Activer
-                  </button>
-                )}
-              </td>
+      <div className="hidden sm:block overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-gray-800/60 text-gray-400 text-xs uppercase tracking-wider">
+              <th className="text-left py-3 px-4 font-medium">Nom</th>
+              <th className="text-left py-3 px-4 font-medium">Début</th>
+              <th className="text-left py-3 px-4 font-medium">Fin</th>
+              <th className="text-left py-3 px-4 font-medium">Statut</th>
+              <th className="text-right py-3 px-4 font-medium">Action</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {seasons.map((season) => (
+              <tr
+                key={season.id}
+                className="border-t border-gray-800/60 hover:bg-gray-800/40 transition-colors"
+              >
+                <td className="py-3 px-4 font-medium text-white">{season.name}</td>
+                <td className="py-3 px-4 tabular-nums">{season.startDate}</td>
+                <td className="py-3 px-4 tabular-nums">{season.endDate}</td>
+                <td className="py-3 px-4">
+                  {season.isActive ? (
+                    <span className="text-green-400 text-xs font-medium bg-green-400/10 px-2 py-0.5 rounded">
+                      Active
+                    </span>
+                  ) : (
+                    <span className="text-gray-500 text-xs">Inactive</span>
+                  )}
+                </td>
+                <td className="py-3 px-4 text-right">
+                  {!season.isActive && (
+                    <button
+                      onClick={async () => {
+                        await fetch("/api/seasons", {
+                          method: "PUT",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ seasonId: season.id }),
+                        });
+                        onSetActive();
+                      }}
+                      className="text-blue-400 hover:text-blue-300 text-xs font-medium transition-colors"
+                    >
+                      Activer
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="sm:hidden divide-y divide-gray-800/60">
+        {seasons.map((season) => (
+          <div key={season.id} className="px-4 py-3 flex items-center justify-between">
+            <div>
+              <div className="font-medium text-white text-sm">{season.name}</div>
+              <div className="text-xs text-gray-500 mt-0.5 tabular-nums">
+                {season.startDate} → {season.endDate}
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              {season.isActive ? (
+                <span className="text-green-400 text-xs font-medium bg-green-400/10 px-2 py-0.5 rounded">
+                  Active
+                </span>
+              ) : (
+                <button
+                  onClick={async () => {
+                    await fetch("/api/seasons", {
+                      method: "PUT",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ seasonId: season.id }),
+                    });
+                    onSetActive();
+                  }}
+                  className="text-blue-400 hover:text-blue-300 text-xs font-medium transition-colors"
+                >
+                  Activer
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -194,7 +230,7 @@ function NewSeasonForm({
   }
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl px-6 py-5">
+    <div className="bg-gray-900 border border-gray-800 rounded-xl px-4 sm:px-6 py-5">
       <h4 className="text-sm font-medium text-white mb-4">Nouvelle saison</h4>
 
       {error && <p className="text-sm text-red-400 mb-3">{error}</p>}
@@ -248,7 +284,7 @@ function NewSeasonForm({
                     placeholder="Level"
                     value={startLevels[player.id] || ""}
                     onChange={(e) => updateLevel(player.id, e.target.value)}
-                    className="w-24 bg-gray-700 border border-gray-600 rounded-md px-2 py-1 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                    className="w-20 sm:w-24 bg-gray-700 border border-gray-600 rounded-md px-2 py-1 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                   />
                 )}
               </div>

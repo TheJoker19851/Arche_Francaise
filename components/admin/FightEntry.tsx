@@ -141,7 +141,7 @@ export default function FightEntry() {
   }
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl px-6 py-5">
+    <div className="bg-gray-900 border border-gray-800 rounded-xl px-4 sm:px-6 py-5">
       <h4 className="text-sm font-medium text-white mb-4">Nouveau combat</h4>
 
       {error && <p className="text-sm text-red-400 mb-3">{error}</p>}
@@ -172,7 +172,8 @@ export default function FightEntry() {
         </div>
 
         <h5 className="text-xs text-gray-400 uppercase tracking-wider mb-2">Joueurs</h5>
-        <div className="bg-gray-800/50 rounded-lg overflow-hidden mb-4">
+
+        <div className="hidden sm:block bg-gray-800/50 rounded-lg overflow-hidden mb-4">
           <table className="w-full text-sm">
             <thead>
               <tr className="text-gray-500 text-xs uppercase tracking-wider">
@@ -234,6 +235,61 @@ export default function FightEntry() {
               ))}
             </tbody>
           </table>
+        </div>
+
+        <div className="sm:hidden space-y-2 mb-4">
+          {playerEntries.map((entry, idx) => (
+            <div
+              key={entry.playerId}
+              className={`bg-gray-800/50 rounded-lg p-3 ${!entry.included ? "opacity-50" : ""}`}
+            >
+              <label className="flex items-center gap-2 mb-2">
+                <input
+                  type="checkbox"
+                  checked={entry.included}
+                  onChange={() => togglePlayer(idx)}
+                  className="rounded border-gray-600 bg-gray-700 text-blue-500 focus:ring-blue-500/50"
+                />
+                <span className={`text-sm font-medium ${entry.included ? "text-white" : "text-gray-500"}`}>
+                  {entry.playerName}
+                </span>
+              </label>
+              {entry.included && (
+                <div className="grid grid-cols-3 gap-2">
+                  <div>
+                    <label className="text-xs text-gray-500">Level</label>
+                    <input
+                      type="number"
+                      placeholder="0"
+                      value={entry.levelAtFight}
+                      onChange={(e) => updateField(idx, "levelAtFight", e.target.value)}
+                      className="w-full bg-gray-700 border border-gray-600 rounded-md px-2 py-1 text-sm text-right tabular-nums text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500">DMG</label>
+                    <input
+                      type="number"
+                      placeholder="0"
+                      value={entry.damage}
+                      onChange={(e) => updateField(idx, "damage", e.target.value)}
+                      className="w-full bg-gray-700 border border-gray-600 rounded-md px-2 py-1 text-sm text-right tabular-nums text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500">SH</label>
+                    <input
+                      type="number"
+                      placeholder="0"
+                      value={entry.shieldsBroken}
+                      onChange={(e) => updateField(idx, "shieldsBroken", e.target.value)}
+                      className="w-full bg-gray-700 border border-gray-600 rounded-md px-2 py-1 text-sm text-right tabular-nums text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
 
         <button

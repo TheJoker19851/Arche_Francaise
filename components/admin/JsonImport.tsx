@@ -106,7 +106,7 @@ export default function JsonImport() {
   }
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl px-6 py-5">
+    <div className="bg-gray-900 border border-gray-800 rounded-xl px-4 sm:px-6 py-5">
       <h4 className="text-sm font-medium text-white mb-4">Import JSON</h4>
 
       {parseError && <p className="text-sm text-red-400 mb-3">{parseError}</p>}
@@ -154,7 +154,7 @@ function FightPreview({
 
   return (
     <div className="border border-gray-700 rounded-lg overflow-hidden">
-      <div className="bg-gray-800/50 px-4 py-3 flex items-center justify-between">
+      <div className="bg-gray-800/50 px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
           <span className="text-white font-medium text-sm">{parsed.against}</span>
           <span className="text-gray-500 text-sm ml-3">{parsed.fightDate}</span>
@@ -181,7 +181,8 @@ function FightPreview({
         </div>
       )}
 
-      <table className="w-full text-sm">
+      <div className="overflow-x-auto">
+      <table className="w-full text-sm min-w-[400px]">
         <thead>
           <tr className="text-gray-500 text-xs uppercase tracking-wider">
             <th className="text-left py-2 px-4 font-medium">Joueur</th>
@@ -209,6 +210,7 @@ function FightPreview({
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

@@ -64,15 +64,15 @@ export default function FightEditor() {
             key={fight.fightId}
             className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden"
           >
-            <div className="flex items-center justify-between px-4 py-3">
-              <div className="flex items-center gap-4">
-                <span className="font-medium text-white text-sm">{fight.against}</span>
-                <span className="text-gray-500 text-sm tabular-nums">{fight.fightDate}</span>
-                <span className="text-gray-500 text-xs">
+            <div className="flex items-center justify-between px-4 py-3 gap-2">
+              <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+                <span className="font-medium text-white text-sm truncate">{fight.against}</span>
+                <span className="text-gray-500 text-sm tabular-nums hidden sm:inline">{fight.fightDate}</span>
+                <span className="text-gray-500 text-xs hidden sm:inline">
                   {fight.participants} joueur{fight.participants !== 1 ? "s" : ""}
                 </span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-shrink-0">
                 <button
                   onClick={() => setEditingFightId(fight.fightId)}
                   className="text-blue-400 hover:text-blue-300 text-xs font-medium transition-colors px-2 py-1"
@@ -100,10 +100,13 @@ export default function FightEditor() {
                     onClick={() => setDeletingFightId(fight.fightId)}
                     className="text-red-400/60 hover:text-red-400 text-xs font-medium transition-colors px-2 py-1"
                   >
-                    Supprimer
+                    Suppr.
                   </button>
                 )}
               </div>
+            </div>
+            <div className="sm:hidden px-4 pb-2 text-xs text-gray-500 tabular-nums">
+              {fight.fightDate} — {fight.participants} joueur{fight.participants !== 1 ? "s" : ""}
             </div>
 
             <FightEntriesList entries={fight.entries} />
@@ -119,26 +122,28 @@ function FightEntriesList({ entries }: { entries: FightEntryDetail[] }) {
 
   return (
     <div className="border-t border-gray-800/60 px-4 py-2">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="text-gray-500 text-xs uppercase tracking-wider">
-            <th className="text-left py-1.5 px-2 font-medium">Joueur</th>
-            <th className="text-right py-1.5 px-2 font-medium">Level</th>
-            <th className="text-right py-1.5 px-2 font-medium">Damage</th>
-            <th className="text-right py-1.5 px-2 font-medium">Bouclier</th>
-          </tr>
-        </thead>
-        <tbody>
-          {entries.map((entry) => (
-            <tr key={entry.playerId} className="border-t border-gray-800/30">
-              <td className="py-1.5 px-2 text-white">{entry.playerName}</td>
-              <td className="py-1.5 px-2 text-right tabular-nums">{entry.levelAtFight}</td>
-              <td className="py-1.5 px-2 text-right tabular-nums">{formatCompactNumber(entry.damage)}</td>
-              <td className="py-1.5 px-2 text-right tabular-nums">{formatCompactNumber(entry.shieldsBroken)}</td>
+      <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+        <table className="w-full text-sm min-w-[350px]">
+          <thead>
+            <tr className="text-gray-500 text-xs uppercase tracking-wider">
+              <th className="text-left py-1.5 px-2 font-medium">Joueur</th>
+              <th className="text-right py-1.5 px-2 font-medium">Level</th>
+              <th className="text-right py-1.5 px-2 font-medium">Damage</th>
+              <th className="text-right py-1.5 px-2 font-medium">Bouclier</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {entries.map((entry) => (
+              <tr key={entry.playerId} className="border-t border-gray-800/30">
+                <td className="py-1.5 px-2 text-white">{entry.playerName}</td>
+                <td className="py-1.5 px-2 text-right tabular-nums">{entry.levelAtFight}</td>
+                <td className="py-1.5 px-2 text-right tabular-nums">{formatCompactNumber(entry.damage)}</td>
+                <td className="py-1.5 px-2 text-right tabular-nums">{formatCompactNumber(entry.shieldsBroken)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
@@ -220,7 +225,7 @@ function EditFightForm({
   }
 
   return (
-    <div className="bg-gray-900 border border-blue-800/50 rounded-xl px-6 py-5">
+    <div className="bg-gray-900 border border-blue-800/50 rounded-xl px-4 sm:px-6 py-5">
       <h4 className="text-sm font-medium text-white mb-4">Éditer le combat</h4>
 
       {error && <p className="text-sm text-red-400 mb-3">{error}</p>}
@@ -248,60 +253,62 @@ function EditFightForm({
           />
         </div>
 
-        <div className="bg-gray-800/50 rounded-lg overflow-hidden mb-4">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-gray-500 text-xs uppercase tracking-wider">
-                <th className="text-left py-2 px-3 font-medium">Joueur</th>
-                <th className="text-right py-2 px-3 font-medium">Level</th>
-                <th className="text-right py-2 px-3 font-medium">Damage</th>
-                <th className="text-right py-2 px-3 font-medium">Bouclier</th>
-              </tr>
-            </thead>
-            <tbody>
-              {fight.entries.map((entry, idx) => (
-                <tr key={entry.playerId} className="border-t border-gray-700/50">
-                  <td className="py-2 px-3 text-white">{entry.playerName}</td>
-                  <td className="py-2 px-3">
-                    <input
-                      type="number"
-                      value={entry.levelAtFight}
-                      onChange={(e) => {
-                        const updated = [...fight.entries];
-                        updated[idx] = { ...updated[idx], levelAtFight: parseInt(e.target.value, 10) || 0 };
-                        setFight({ ...fight, entries: updated });
-                      }}
-                      className="w-full bg-gray-700 border border-gray-600 rounded-md px-2 py-1 text-sm text-right tabular-nums text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                    />
-                  </td>
-                  <td className="py-2 px-3">
-                    <input
-                      type="number"
-                      value={entry.damage}
-                      onChange={(e) => {
-                        const updated = [...fight.entries];
-                        updated[idx] = { ...updated[idx], damage: parseInt(e.target.value, 10) || 0 };
-                        setFight({ ...fight, entries: updated });
-                      }}
-                      className="w-full bg-gray-700 border border-gray-600 rounded-md px-2 py-1 text-sm text-right tabular-nums text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                    />
-                  </td>
-                  <td className="py-2 px-3">
-                    <input
-                      type="number"
-                      value={entry.shieldsBroken}
-                      onChange={(e) => {
-                        const updated = [...fight.entries];
-                        updated[idx] = { ...updated[idx], shieldsBroken: parseInt(e.target.value, 10) || 0 };
-                        setFight({ ...fight, entries: updated });
-                      }}
-                      className="w-full bg-gray-700 border border-gray-600 rounded-md px-2 py-1 text-sm text-right tabular-nums text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                    />
-                  </td>
+        <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 mb-4">
+          <div className="bg-gray-800/50 rounded-lg overflow-hidden min-w-[450px]">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-gray-500 text-xs uppercase tracking-wider">
+                  <th className="text-left py-2 px-3 font-medium">Joueur</th>
+                  <th className="text-right py-2 px-3 font-medium">Level</th>
+                  <th className="text-right py-2 px-3 font-medium">Damage</th>
+                  <th className="text-right py-2 px-3 font-medium">Bouclier</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {fight.entries.map((entry, idx) => (
+                  <tr key={entry.playerId} className="border-t border-gray-700/50">
+                    <td className="py-2 px-3 text-white">{entry.playerName}</td>
+                    <td className="py-2 px-3">
+                      <input
+                        type="number"
+                        value={entry.levelAtFight}
+                        onChange={(e) => {
+                          const updated = [...fight.entries];
+                          updated[idx] = { ...updated[idx], levelAtFight: parseInt(e.target.value, 10) || 0 };
+                          setFight({ ...fight, entries: updated });
+                        }}
+                        className="w-full bg-gray-700 border border-gray-600 rounded-md px-2 py-1 text-sm text-right tabular-nums text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                      />
+                    </td>
+                    <td className="py-2 px-3">
+                      <input
+                        type="number"
+                        value={entry.damage}
+                        onChange={(e) => {
+                          const updated = [...fight.entries];
+                          updated[idx] = { ...updated[idx], damage: parseInt(e.target.value, 10) || 0 };
+                          setFight({ ...fight, entries: updated });
+                        }}
+                        className="w-full bg-gray-700 border border-gray-600 rounded-md px-2 py-1 text-sm text-right tabular-nums text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                      />
+                    </td>
+                    <td className="py-2 px-3">
+                      <input
+                        type="number"
+                        value={entry.shieldsBroken}
+                        onChange={(e) => {
+                          const updated = [...fight.entries];
+                          updated[idx] = { ...updated[idx], shieldsBroken: parseInt(e.target.value, 10) || 0 };
+                          setFight({ ...fight, entries: updated });
+                        }}
+                        className="w-full bg-gray-700 border border-gray-600 rounded-md px-2 py-1 text-sm text-right tabular-nums text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <div className="flex gap-3">

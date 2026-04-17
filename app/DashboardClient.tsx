@@ -17,7 +17,7 @@ export default function DashboardClient({ data }: { data: DashboardData | null }
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-white">{data.season.name}</h2>
+        <h2 className="text-lg sm:text-xl font-semibold text-white truncate">{data.season.name}</h2>
       </div>
       <KpiCards cards={data.kpiCards} />
       <DashboardTable players={data.players} />

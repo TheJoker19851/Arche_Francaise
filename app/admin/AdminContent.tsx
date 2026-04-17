@@ -24,12 +24,12 @@ export default function AdminContent() {
         <h2 className="text-xl font-semibold text-white">Administration</h2>
       </div>
 
-      <div className="flex space-x-1 mb-6 bg-gray-900 border border-gray-800 rounded-lg p-1">
+      <div className="flex space-x-1 mb-6 bg-gray-900 border border-gray-800 rounded-lg p-1 overflow-x-auto">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+            className={`px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-md whitespace-nowrap transition-colors ${
               activeTab === tab.id
                 ? "bg-gray-800 text-white"
                 : "text-gray-400 hover:text-white hover:bg-gray-800/50"
