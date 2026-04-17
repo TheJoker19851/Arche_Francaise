@@ -67,15 +67,11 @@ export async function POST(request: NextRequest) {
         season.id,
         entry.levelAtFight
       );
+      seasonPlayerIds.add(playerId);
     }
 
     if (!playerId) {
       return NextResponse.json({ error: "Entry missing playerId or playerName" }, { status: 400 });
-    }
-
-    if (!seasonPlayerIds.has(playerId)) {
-      await addPlayerToSeason(playerId, playerId, season.id, entry.levelAtFight);
-      seasonPlayerIds.add(playerId);
     }
 
     resolvedEntries.push({
