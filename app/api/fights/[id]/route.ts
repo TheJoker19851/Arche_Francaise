@@ -37,7 +37,7 @@ export async function PUT(
     against: string;
     fightDate: string;
     notes?: string;
-    entries: { playerId: string; levelAtFight: number; damage: number; shieldsBroken: number }[];
+    entries: { playerId: string; levelAtFight: number; damage: number; shieldsBroken: number; wasPresentLive?: true | null }[];
   };
 
   const fight = await getFightById(id);
@@ -56,6 +56,7 @@ export async function PUT(
     levelAtFight: e.levelAtFight,
     damage: e.damage,
     shieldsBroken: e.shieldsBroken,
+    wasPresentLive: (e.wasPresentLive === true ? true : null) as true | null,
   }));
 
   await updateFightWithEntries(fight, newEntries);

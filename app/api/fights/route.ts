@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
       against: string;
       fightDate: string;
       notes?: string;
-      entries: { playerId?: string; playerName?: string; levelAtFight: number; damage: number; shieldsBroken: number }[];
+      entries: { playerId?: string; playerName?: string; levelAtFight: number; damage: number; shieldsBroken: number; wasPresentLive?: true | null }[];
     };
 
     if (!against || !fightDate || !entries?.length) {
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     const seasonPlayers = await getSeasonPlayers(season.id);
     const seasonPlayerIds = new Set(seasonPlayers.map((sp) => sp.playerId));
 
-    const resolvedEntries: { playerId: string; levelAtFight: number; damage: number; shieldsBroken: number }[] = [];
+    const resolvedEntries: { playerId: string; levelAtFight: number; damage: number; shieldsBroken: number; wasPresentLive: true | null }[] = [];
 
     for (const entry of entries) {
       if (!Number.isInteger(entry.damage) || entry.damage < 0) {
@@ -80,6 +80,7 @@ export async function POST(request: NextRequest) {
         levelAtFight: entry.levelAtFight,
         damage: entry.damage,
         shieldsBroken: entry.shieldsBroken,
+        wasPresentLive: entry.wasPresentLive === true ? true : null,
       });
     }
 
@@ -99,6 +100,7 @@ export async function POST(request: NextRequest) {
       levelAtFight: e.levelAtFight,
       damage: e.damage,
       shieldsBroken: e.shieldsBroken,
+      wasPresentLive: e.wasPresentLive,
     }));
 
     await addFight(fight, fightEntries);

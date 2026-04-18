@@ -87,6 +87,7 @@ export function computeFightSummary(
     levelAtFight: e.levelAtFight,
     damage: e.damage,
     shieldsBroken: e.shieldsBroken,
+    wasPresentLive: e.wasPresentLive,
   })).sort((a, b) => b.damage - a.damage);
 
   const totalDamage = entries.reduce((sum, e) => sum + e.damage, 0);

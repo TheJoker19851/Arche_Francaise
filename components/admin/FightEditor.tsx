@@ -194,6 +194,7 @@ function EditFightForm({
         levelAtFight: entry.levelAtFight,
         damage: entry.damage,
         shieldsBroken: entry.shieldsBroken,
+        wasPresentLive: entry.wasPresentLive,
       }));
 
       const res = await fetch(`/api/fights/${fightId}`, {
@@ -262,6 +263,7 @@ function EditFightForm({
                   <th className="text-right py-2 px-3 font-medium">Level</th>
                   <th className="text-right py-2 px-3 font-medium">Damage</th>
                   <th className="text-right py-2 px-3 font-medium">Bouclier</th>
+                  <th className="text-center py-2 px-3 font-medium">LIVE</th>
                 </tr>
               </thead>
               <tbody>
@@ -302,6 +304,18 @@ function EditFightForm({
                           setFight({ ...fight, entries: updated });
                         }}
                         className="w-full bg-gray-700 border border-gray-600 rounded-md px-2 py-1 text-sm text-right tabular-nums text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                      />
+                    </td>
+                    <td className="py-2 px-3 text-center">
+                      <input
+                        type="checkbox"
+                        checked={entry.wasPresentLive === true}
+                        onChange={() => {
+                          const updated = [...fight.entries];
+                          updated[idx] = { ...updated[idx], wasPresentLive: updated[idx].wasPresentLive === true ? null : true };
+                          setFight({ ...fight, entries: updated });
+                        }}
+                        className="rounded border-gray-600 bg-gray-700 text-blue-500 focus:ring-blue-500/50"
                       />
                     </td>
                   </tr>

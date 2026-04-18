@@ -36,7 +36,8 @@ export const SCHEMA_SQL = [
     player_id TEXT NOT NULL REFERENCES players(id),
     level_at_fight INTEGER NOT NULL DEFAULT 0,
     damage INTEGER NOT NULL DEFAULT 0,
-    shields_broken INTEGER NOT NULL DEFAULT 0
+    shields_broken INTEGER NOT NULL DEFAULT 0,
+    was_present_live INTEGER DEFAULT NULL
   )`,
 ];
 

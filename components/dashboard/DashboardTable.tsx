@@ -22,8 +22,8 @@ export default function DashboardTable({ players }: { players: PlayerSeasonStats
               <th className="text-right py-3 px-4 font-medium">Level</th>
               <th className="text-right py-3 px-4 font-medium">+Level</th>
               <th className="text-right py-3 px-4 font-medium">DMG total</th>
-              <th className="text-right py-3 px-4 font-medium">SH total</th>
-              <th className="text-right py-3 px-4 font-medium">Fights</th>
+              <th className="text-right py-3 px-4 font-medium">Bouclier</th>
+              <th className="text-right py-3 px-4 font-medium">Combats</th>
             </tr>
           </thead>
           <tbody>
@@ -74,7 +74,7 @@ export default function DashboardTable({ players }: { players: PlayerSeasonStats
                       <div className="text-sm text-white tabular-nums font-semibold">{formatCompactNumber(player.totalDamage)}</div>
                     </div>
                     <div>
-                      <div className="text-xs text-gray-500 uppercase">SH</div>
+                      <div className="text-xs text-gray-500 uppercase">Bouclier</div>
                       <div className="text-sm text-white tabular-nums">{formatCompactNumber(player.totalShields)}</div>
                     </div>
                   </div>

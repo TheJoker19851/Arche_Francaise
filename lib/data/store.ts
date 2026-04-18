@@ -122,7 +122,7 @@ export async function getData() {
 export async function addFight(fight: Fight, entries: FightEntry[]): Promise<void> {
   await init();
   const db = getDb();
-  const stmts: Array<string | { sql: string; args: (string | number)[] }> = [
+  const stmts: Array<string | { sql: string; args: (string | number | null)[] }> = [
     {
       sql: "INSERT INTO fights (id, season_id, against, fight_date, notes) VALUES (?, ?, ?, ?, ?)",
       args: [fight.id, fight.seasonId, fight.against, fight.fightDate, fight.notes || ""],
@@ -131,8 +131,8 @@ export async function addFight(fight: Fight, entries: FightEntry[]): Promise<voi
 
   for (const entry of entries) {
     stmts.push({
-      sql: "INSERT INTO fight_entries (id, fight_id, player_id, level_at_fight, damage, shields_broken) VALUES (?, ?, ?, ?, ?, ?)",
-      args: [entry.id, entry.fightId, entry.playerId, entry.levelAtFight, entry.damage, entry.shieldsBroken],
+      sql: "INSERT INTO fight_entries (id, fight_id, player_id, level_at_fight, damage, shields_broken, was_present_live) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      args: [entry.id, entry.fightId, entry.playerId, entry.levelAtFight, entry.damage, entry.shieldsBroken, entry.wasPresentLive === true ? 1 : null],
     });
   }
 
@@ -175,7 +175,7 @@ export async function updateFightEntry(entry: FightEntry): Promise<void> {
 export async function updateFightWithEntries(fight: Fight, entries: FightEntry[]): Promise<void> {
   await init();
   const db = getDb();
-  const stmts: Array<string | { sql: string; args: (string | number)[] }> = [
+  const stmts: Array<string | { sql: string; args: (string | number | null)[] }> = [
     {
       sql: "UPDATE fights SET season_id = ?, against = ?, fight_date = ?, notes = ? WHERE id = ?",
       args: [fight.seasonId, fight.against, fight.fightDate, fight.notes || "", fight.id],
@@ -188,8 +188,8 @@ export async function updateFightWithEntries(fight: Fight, entries: FightEntry[]
 
   for (const entry of entries) {
     stmts.push({
-      sql: "INSERT INTO fight_entries (id, fight_id, player_id, level_at_fight, damage, shields_broken) VALUES (?, ?, ?, ?, ?, ?)",
-      args: [entry.id, entry.fightId, entry.playerId, entry.levelAtFight, entry.damage, entry.shieldsBroken],
+      sql: "INSERT INTO fight_entries (id, fight_id, player_id, level_at_fight, damage, shields_broken, was_present_live) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      args: [entry.id, entry.fightId, entry.playerId, entry.levelAtFight, entry.damage, entry.shieldsBroken, entry.wasPresentLive === true ? 1 : null],
     });
   }
 
@@ -333,5 +333,6 @@ function rowToFightEntry(row: Record<string, unknown>): FightEntry {
     levelAtFight: row.level_at_fight as number,
     damage: row.damage as number,
     shieldsBroken: row.shields_broken as number,
+    wasPresentLive: (row.was_present_live as number) === 1 ? true : null,
   };
 }

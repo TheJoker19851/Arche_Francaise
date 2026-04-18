@@ -34,6 +34,7 @@ export interface FightEntry {
   levelAtFight: number;
   damage: number;
   shieldsBroken: number;
+  wasPresentLive: true | null;
 }
 
 export interface PlayerSeasonStats {
@@ -73,6 +74,7 @@ export interface FightEntryDetail {
   levelAtFight: number;
   damage: number;
   shieldsBroken: number;
+  wasPresentLive: true | null;
 }
 
 export interface DashboardData {

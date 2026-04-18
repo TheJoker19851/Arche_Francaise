@@ -16,6 +16,7 @@ interface ParsedEntry {
   shieldsBroken: number;
   matchedPlayerId: string | null;
   isNew: boolean;
+  wasPresentLive: true | null;
 }
 
 interface ParsedFight {
@@ -74,6 +75,7 @@ export default function JsonImport() {
         levelAtFight: e.levelAtFight,
         damage: e.damage,
         shieldsBroken: e.shieldsBroken,
+        wasPresentLive: e.wasPresentLive,
       }));
 
       const res = await fetch("/api/fights", {
@@ -135,6 +137,13 @@ export default function JsonImport() {
           parsed={parsed}
           onImport={handleImport}
           saving={saving}
+          onToggleLive={(index) => {
+            const updated = { ...parsed };
+            updated.entries = updated.entries.map((e, i) =>
+              i === index ? { ...e, wasPresentLive: e.wasPresentLive === true ? null : true } : e
+            );
+            setParsed(updated);
+          }}
         />
       )}
     </div>
@@ -145,10 +154,12 @@ function FightPreview({
   parsed,
   onImport,
   saving,
+  onToggleLive,
 }: {
   parsed: ParsedFight;
   onImport: () => void;
   saving: boolean;
+  onToggleLive: (index: number) => void;
 }) {
   const newCount = parsed.entries.filter((e) => e.isNew).length;
 
@@ -190,6 +201,7 @@ function FightPreview({
             <th className="text-right py-2 px-3 font-medium">Damage</th>
             <th className="text-right py-2 px-3 font-medium">Bouclier</th>
             <th className="text-left py-2 px-3 font-medium">Statut</th>
+            <th className="text-center py-2 px-3 font-medium">LIVE</th>
           </tr>
         </thead>
         <tbody>
@@ -205,6 +217,14 @@ function FightPreview({
                 ) : (
                   <span className="text-green-400 text-xs">OK</span>
                 )}
+              </td>
+              <td className="py-2 px-3 text-center">
+                <input
+                  type="checkbox"
+                  checked={entry.wasPresentLive === true}
+                  onChange={() => onToggleLive(i)}
+                  className="rounded border-gray-600 bg-gray-700 text-blue-500 focus:ring-blue-500/50"
+                />
               </td>
             </tr>
           ))}
@@ -287,6 +307,7 @@ function validateAndParse(raw: unknown, knownPlayers: SeasonPlayer[]): ParsedFig
       shieldsBroken: typeof shieldsBroken === "number" ? shieldsBroken : 0,
       matchedPlayerId,
       isNew,
+      wasPresentLive: null,
     };
   });
 
