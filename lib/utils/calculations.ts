@@ -35,16 +35,18 @@ export function computePlayerStats(
     const totalShields = playerEntries.reduce((sum, e) => sum + e.shieldsBroken, 0);
     const fightsPlayed = playerEntries.length;
 
-    const lastEntry = playerEntries.length > 0
-      ? playerEntries.reduce((latest, e) => {
-          const fight = seasonFights.find((f) => f.id === e.fightId)!;
-          const currentLatest = seasonFights.find((f) => f.id === latest.fightId)!;
-          return fight.fightDate > currentLatest.fightDate ? e : latest;
-        })
-      : null;
+    const sortedEntries = playerEntries.map((e) => {
+      const fight = seasonFights.find((f) => f.id === e.fightId)!;
+      return { entry: e, fightDate: fight.fightDate, fightId: fight.id };
+    }).sort((a, b) => {
+      const cmp = a.fightDate.localeCompare(b.fightDate);
+      if (cmp !== 0) return cmp;
+      return a.fightId.localeCompare(b.fightId);
+    });
 
-    const currentLevel = lastEntry ? lastEntry.levelAtFight : sp.startLevel;
-    const levelGain = currentLevel - sp.startLevel;
+    const firstLevel = sortedEntries.length > 0 ? sortedEntries[0].entry.levelAtFight : 0;
+    const currentLevel = sortedEntries.length > 0 ? sortedEntries[sortedEntries.length - 1].entry.levelAtFight : sp.startLevel;
+    const levelGain = sortedEntries.length > 1 ? currentLevel - firstLevel : 0;
 
     const fightDetails: PlayerFightDetail[] = playerEntries.map((e) => {
       const fight = seasonFights.find((f) => f.id === e.fightId)!;
