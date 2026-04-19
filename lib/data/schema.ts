@@ -43,4 +43,7 @@ export const SCHEMA_SQL = [
 
 export async function ensureSchema(db: ReturnType<typeof import("./db")["getDb"]>) {
   await db.migrate(SCHEMA_SQL);
+  try {
+    await db.execute("ALTER TABLE fight_entries ADD COLUMN was_present_live INTEGER DEFAULT NULL");
+  } catch {}
 }
