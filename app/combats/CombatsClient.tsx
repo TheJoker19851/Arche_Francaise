@@ -182,6 +182,7 @@ function MobileFightDetails({ fight }: { fight: FightSummary }) {
             <div className="flex items-center gap-2 min-w-0 flex-1">
               {idx === 0 && <span className="text-yellow-400 text-sm">★</span>}
               <span className="text-sm text-white font-medium truncate">{entry.playerName}</span>
+              <span className={`inline-block w-1.5 h-1.5 rounded-full flex-shrink-0 ${entry.wasPresentLive === true ? "bg-green-500" : "bg-red-500/60"}`} />
             </div>
             <div className="flex items-center gap-3 flex-shrink-0 text-xs">
               <span className="text-gray-400">Lv{entry.levelAtFight}</span>
@@ -209,6 +210,7 @@ function DesktopFightDetails({ fight }: { fight: FightSummary }) {
         <thead>
           <tr className="text-gray-500 text-xs uppercase tracking-wider">
             <th className="text-left py-2 px-3 font-medium">Joueur</th>
+            <th className="text-center py-2 px-3 font-medium">Live</th>
             <th className="text-right py-2 px-3 font-medium">Level</th>
             <th className="text-right py-2 px-3 font-medium">Damage</th>
             <th className="text-right py-2 px-3 font-medium">Bouclier</th>
@@ -220,6 +222,9 @@ function DesktopFightDetails({ fight }: { fight: FightSummary }) {
               <td className="py-2 px-3 font-medium">
                 {idx === 0 && <span className="text-yellow-400 mr-1">★</span>}
                 {entry.playerName}
+              </td>
+              <td className="py-2 px-3 text-center">
+                <span className={`inline-block w-2 h-2 rounded-full ${entry.wasPresentLive === true ? "bg-green-500" : "bg-red-500/60"}`} />
               </td>
               <td className="py-2 px-3 text-right tabular-nums">{entry.levelAtFight}</td>
               <td className="py-2 px-3 text-right tabular-nums font-semibold">

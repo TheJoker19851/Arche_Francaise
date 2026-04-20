@@ -127,6 +127,7 @@ function FightEntriesList({ entries }: { entries: FightEntryDetail[] }) {
           <thead>
             <tr className="text-gray-500 text-xs uppercase tracking-wider">
               <th className="text-left py-1.5 px-2 font-medium">Joueur</th>
+              <th className="text-center py-1.5 px-2 font-medium">Live</th>
               <th className="text-right py-1.5 px-2 font-medium">Level</th>
               <th className="text-right py-1.5 px-2 font-medium">Damage</th>
               <th className="text-right py-1.5 px-2 font-medium">Bouclier</th>
@@ -136,6 +137,9 @@ function FightEntriesList({ entries }: { entries: FightEntryDetail[] }) {
             {entries.map((entry) => (
               <tr key={entry.playerId} className="border-t border-gray-800/30">
                 <td className="py-1.5 px-2 text-white">{entry.playerName}</td>
+                <td className="py-1.5 px-2 text-center">
+                  <span className={`inline-block w-2 h-2 rounded-full ${entry.wasPresentLive === true ? "bg-green-500" : "bg-red-500/60"}`} />
+                </td>
                 <td className="py-1.5 px-2 text-right tabular-nums">{entry.levelAtFight}</td>
                 <td className="py-1.5 px-2 text-right tabular-nums">{formatCompactNumber(entry.damage)}</td>
                 <td className="py-1.5 px-2 text-right tabular-nums">{formatCompactNumber(entry.shieldsBroken)}</td>
