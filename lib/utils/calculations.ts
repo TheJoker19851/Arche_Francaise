@@ -21,14 +21,12 @@ export function computePlayerStats(
   const seasonFights = fights.filter((f) => f.seasonId === season.id);
   const seasonFightIds = new Set(seasonFights.map((f) => f.id));
   const seasonEntries = fightEntries.filter((e) => seasonFightIds.has(e.fightId));
-  const seasonPlayerMap = new Map(seasonPlayers.map((sp) => [sp.playerId, sp]));
   const playerMap = new Map(players.map((p) => [p.id, p]));
 
-  const activeSeasonPlayerIds = seasonPlayers.map((sp) => sp.playerId);
+  const activePlayerIds = [...new Set(seasonEntries.map((e) => e.playerId))];
 
-  return activeSeasonPlayerIds.map((playerId) => {
-    const player = playerMap.get(playerId)!;
-    const sp = seasonPlayerMap.get(playerId)!;
+  return activePlayerIds.map((playerId) => {
+    const player = playerMap.get(playerId);
     const playerEntries = seasonEntries.filter((e) => e.playerId === playerId);
 
     const totalDamage = playerEntries.reduce((sum, e) => sum + e.damage, 0);
@@ -44,8 +42,8 @@ export function computePlayerStats(
       return a.fightId.localeCompare(b.fightId);
     });
 
-    const firstLevel = sortedEntries.length > 0 ? sortedEntries[0].entry.levelAtFight : 0;
-    const currentLevel = sortedEntries.length > 0 ? sortedEntries[sortedEntries.length - 1].entry.levelAtFight : sp.startLevel;
+    const firstLevel = sortedEntries[0].entry.levelAtFight;
+    const currentLevel = sortedEntries[sortedEntries.length - 1].entry.levelAtFight;
     const levelGain = sortedEntries.length > 1 ? currentLevel - firstLevel : 0;
 
     const fightDetails: PlayerFightDetail[] = playerEntries.map((e) => {
@@ -62,7 +60,7 @@ export function computePlayerStats(
 
     return {
       playerId,
-      playerName: player.name,
+      playerName: player?.name ?? "Inconnu",
       currentLevel,
       levelGain,
       totalDamage,

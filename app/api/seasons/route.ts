@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     playerStartLevels: { playerId: string; startLevel: number }[];
   };
 
-  if (!name || !startDate || !endDate || !playerStartLevels?.length) {
+  if (!name || !startDate || !endDate) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     isActive: true,
   };
 
-  const seasonPlayers = playerStartLevels.map((p) => ({
+  const seasonPlayers = (playerStartLevels || []).map((p) => ({
     id: generateId(),
     seasonId,
     playerId: p.playerId,

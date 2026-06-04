@@ -1,11 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Season, Player } from "@/lib/domain/types";
+import { Season } from "@/lib/domain/types";
 
 interface SeasonsData {
   seasons: Season[];
-  players: Player[];
 }
 
 async function fetchSeasonsData(setData: (d: SeasonsData) => void, setLoading: (l: boolean) => void) {
@@ -44,7 +43,7 @@ export default function SeasonManagement() {
       <SeasonsList seasons={data.seasons} onSetActive={() => fetchSeasonsData(setData, setLoading)} />
 
       {showForm && (
-        <NewSeasonForm players={data.players} onCreated={() => { setShowForm(false); fetchSeasonsData(setData, setLoading); }} />
+        <NewSeasonForm onCreated={() => { setShowForm(false); fetchSeasonsData(setData, setLoading); }} />
       )}
     </div>
   );
@@ -157,37 +156,15 @@ function SeasonsList({
 }
 
 function NewSeasonForm({
-  players,
   onCreated,
 }: {
-  players: Player[];
   onCreated: () => void;
 }) {
   const [name, setName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [selectedPlayers, setSelectedPlayers] = useState<Set<string>>(
-    new Set(players.filter((p) => p.isActive).map((p) => p.id))
-  );
-  const [startLevels, setStartLevels] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-
-  function togglePlayer(playerId: string) {
-    setSelectedPlayers((prev) => {
-      const next = new Set(prev);
-      if (next.has(playerId)) {
-        next.delete(playerId);
-      } else {
-        next.add(playerId);
-      }
-      return next;
-    });
-  }
-
-  function updateLevel(playerId: string, level: string) {
-    setStartLevels((prev) => ({ ...prev, [playerId]: level }));
-  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -198,22 +175,12 @@ function NewSeasonForm({
       return;
     }
 
-    const playerStartLevels = Array.from(selectedPlayers).map((playerId) => {
-      const levelStr = startLevels[playerId] || "0";
-      return { playerId, startLevel: parseInt(levelStr, 10) || 0 };
-    });
-
-    if (playerStartLevels.length === 0) {
-      setError("Sélectionnez au moins un joueur");
-      return;
-    }
-
     setSaving(true);
     try {
       const res = await fetch("/api/seasons", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, startDate, endDate, playerStartLevels }),
+        body: JSON.stringify({ name, startDate, endDate }),
       });
 
       if (res.ok) {
@@ -258,39 +225,9 @@ function NewSeasonForm({
           />
         </div>
 
-        <h5 className="text-xs text-gray-400 uppercase tracking-wider mb-2">Joueurs et niveaux de départ</h5>
-        <div className="bg-gray-800/50 rounded-lg p-3 mb-4 space-y-2 max-h-64 overflow-y-auto">
-          {players.map((player) => {
-            const isSelected = selectedPlayers.has(player.id);
-            return (
-              <div
-                key={player.id}
-                className="flex items-center gap-3"
-              >
-                <label className="flex items-center gap-2 flex-1 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={isSelected}
-                    onChange={() => togglePlayer(player.id)}
-                    className="rounded border-gray-600 bg-gray-700 text-blue-500 focus:ring-blue-500/50"
-                  />
-                  <span className={`text-sm ${isSelected ? "text-white" : "text-gray-500"}`}>
-                    {player.name}
-                  </span>
-                </label>
-                {isSelected && (
-                  <input
-                    type="number"
-                    placeholder="Level"
-                    value={startLevels[player.id] || ""}
-                    onChange={(e) => updateLevel(player.id, e.target.value)}
-                    className="w-20 sm:w-24 bg-gray-700 border border-gray-600 rounded-md px-2 py-1 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                  />
-                )}
-              </div>
-            );
-          })}
-        </div>
+        <p className="text-xs text-gray-500 mb-4">
+          Les joueurs seront ajoutés automatiquement lors du premier import de combat.
+        </p>
 
         <button
           type="submit"
